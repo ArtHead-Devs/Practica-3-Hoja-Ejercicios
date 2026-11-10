@@ -1,0 +1,14 @@
+[project]
+name = "practica-3-hoja-ejercicios"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "biopython>=1.88",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+]
