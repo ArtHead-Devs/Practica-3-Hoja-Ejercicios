@@ -11,6 +11,7 @@ Resolución de la Hoja de Ejercicios 2 de la asignatura **Bioinformática en lab
 
 | Ejercicio | Tema | Qué hace |
 |---|---|---|
+| 0 | Needleman-Wunsch y Smith-Waterman en Python puro | Programa sin librerías (solo Python estándar) los algoritmos de alineamiento global y local, los prueba con el ejemplo de la presentación, con casos manuales y con 2000 pares aleatorios de longitud 10 o menos, y compara cada resultado con el de `PairwiseAligner` de Biopython. |
 | 1 | Grid Search de penalizaciones de hueco | Recorre con dos bucles anidados 1000 combinaciones de `open_gap` y `extend_gap`, alinea dos secuencias de ADN con `PairwiseAligner` y guarda en un DataFrame el número de alineamientos óptimos empatados. Dibuja un mapa de calor, demuestra matemáticamente dónde se pasa de empates a una única solución y muestra los alineamientos junto a esa frontera. |
 | 2 | Similitud entre especies | Descarga el citocromo c de cinco especies (humano, chimpancé, ratón, pez cebra y mosca), las lee con `Bio.SeqIO` y calcula el score de alineamiento global de todas contra todas con `BLOSUM62` (25 puntuaciones). Muestra el resultado en un mapa de calor, lo normaliza y repite el experimento con `BLOSUM45`, `BLOSUM80`, `PAM30` y `PAM250`. |
 | 3 | Escalabilidad del alineador | Genera secuencias de ADN aleatorias de 100 a 5000 bases con `random`, mide con `time.perf_counter` cuánto tarda `PairwiseAligner` en alinear cada par, grafica longitud frente a tiempo y estima el exponente de crecimiento y el tiempo para 1 millón de bases. |
@@ -23,7 +24,7 @@ Resolución de la Hoja de Ejercicios 2 de la asignatura **Bioinformática en lab
 │   └── citocromo_c.fasta                  Cinco secuencias de citocromo c (ejercicio 2)
 ├── .gitignore                             
 ├── .python-version                        Versión de Python
-├── Ejercicios BIO-GCID Práctica 2.pdf     Enunciado de la práctica
+├── T03 - Ejercicios BIO-GCID Práctica 2.pdf   Enunciado de la práctica
 ├── LICENSE
 ├── README.md                              
 ├── ejercicios.ipynb                       Cuaderno con la resolución de todos los ejercicios
@@ -60,6 +61,13 @@ La descarga del ejercicio 2 solo se hace si `datos/citocromo_c.fasta` no existe,
 
 ## Decisiones y notas por ejercicio
 
+### Ejercicio 0
+
+- **Python puro.** `needleman_wunsch` y `smith_waterman` no usan ninguna librería: solo listas, bucles y `max`. Siguen los cuatro pasos de la presentación (puntuaciones, iniciar la matriz, rellenarla y rastreo inverso). Biopython solo se usa para comparar.
+- **Puntuaciones.** Las del ejemplo de la presentación: emparejamiento `+5`, desemparejamiento `-4` y hueco `-6`. El hueco es lineal. Para que Biopython puntúe igual, `open_gap_score` y `extend_gap_score` valen `-6`; con eso elige Needleman-Wunsch en modo global y Smith-Waterman en modo local.
+- **Pruebas.** El ejemplo de la presentación (score 15 en global y en local, con las mismas matrices), cinco casos manuales (nucleótidos y aminoácidos) y 2000 pares aleatorios con semilla fija, en global y en local (4000 comparaciones). En todas coincide el score con Biopython y nuestro alineamiento es uno de los óptimos que devuelve Biopython.
+- **Empates.** Biopython devuelve todos los alineamientos óptimos y nuestro código solo uno, porque en el rastreo inverso prefiere la diagonal, luego arriba y luego izquierda.
+
 ### Ejercicio 1
 
 - **Intervalo de búsqueda.** El enunciado da los límites y deja elegir el paso: `open_gap` de -1 a -20 con paso 1 (20 valores) y `extend_gap` de -0.1 a -5.0 con paso 0.1 (50 valores), en total 1000 combinaciones.
@@ -86,7 +94,7 @@ La descarga del ejercicio 2 solo se hace si `datos/citocromo_c.fasta` no existe,
 ### Ejercicio 3
 
 - **Medición.** Una sola medición por tamaño, con el alineador con sus parámetros por defecto y una semilla fija en `random` para que las secuencias sean reproducibles.
-- **Resultados variables.** Los tiempos cambian un poco en cada ejecución. El exponente estimado sale entre 1,8 y 1,9, es decir, un crecimiento aproximadamente cuadrático, O(n²).
+- **Resultados variables.** Los tiempos cambian un poco en cada ejecución. El exponente estimado sale entre 1,8 y 2, es decir, un crecimiento aproximadamente cuadrático, O(n²).
 - **Extrapolación.** Con ese ajuste, un solo par de secuencias de 1 millón de bases tardaría más de una hora, además de necesitar una matriz de unos 10¹² celdas. Si lo que crece es el número de pares de secuencias cortas, el coste es lineal y asumible.
 
 ## Licencia
